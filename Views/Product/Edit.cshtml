@@ -1,0 +1,40 @@
+﻿@model ProjectCRUDOperation.Models.Product
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<h2>Edit Product</h2>
+
+<!-- Display Success or Error Message -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+    <meta http-equiv="refresh" content="2; url=@Url.Action("Index", "Product")" />
+}
+else if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+    <meta http-equiv="refresh" content="2; url=@Url.Action("Edit", "Product")" />
+}
+
+<form method="post" asp-action="Edit">
+    <div class="mb-3">
+        <label for="ProductName" class="form-label">Product Name</label>
+        <input type="text" class="form-control" id="ProductName" name="ProductName" value="@Model.ProductName" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="CategoryId" class="form-label">Category</label>
+        @Html.DropDownListFor(model => model.CategoryId, (SelectList)ViewData["Category"], "Select Category", new { @class = "form-select", id = "CategoryId" })
+    </div>
+
+    <input type="hidden" name="ProductId" value="@Model.ProductId" />
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Cancel</a>
+</form>

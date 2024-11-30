@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Delete Confirmation";
+}
+
+<h2>Delete Confirmation</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+    <!-- Automatically redirect to the Index page after 2 seconds -->
+    <meta http-equiv="refresh" content="2; url=@Url.Action("Index", "Product")" />
+}

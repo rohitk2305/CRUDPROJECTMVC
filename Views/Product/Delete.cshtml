@@ -1,0 +1,27 @@
+﻿@model ProjectCRUDOperation.Models.Product
+
+@{
+    ViewData["Title"] = "Delete Product";
+}
+
+<h2>Delete Product</h2>
+
+<!-- Display Success Message -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+    <meta http-equiv="refresh" content="2; url=@Url.Action("Index", "Product")" />
+}
+
+<div>
+    <h4>Are you sure you want to delete the product <strong>@Model.ProductName</strong>?</h4>
+    <p><strong>Category:</strong> @Model.Category.CategoryName</p>
+
+    <!-- Form for deletion confirmation -->
+    <form method="post" asp-action="DeleteConfirmed" asp-route-id="@Model.ProductId">
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

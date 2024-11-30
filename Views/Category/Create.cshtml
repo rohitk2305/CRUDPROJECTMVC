@@ -1,0 +1,24 @@
+﻿@model ProjectCRUDOperation.Models.Category
+
+@{
+    ViewData["Title"] = "Create Category";
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+    <meta http-equiv="refresh" content="2; url=@Url.Action("Index", "Category")" />
+}
+<h1>Create Category</h1>
+
+<h4>Category</h4>
+<hr />
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="CategoryName">Category Name</label>
+        <input type="text" class="form-control" id="CategoryName" name="CategoryName" required />
+    </div>
+    </br>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>

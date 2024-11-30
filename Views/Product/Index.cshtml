@@ -1,0 +1,57 @@
+﻿@model ProjectCRUDOperation.ViewModels.ProductListViewModel
+
+@{
+    ViewData["Title"] = "Product List";
+    
+}
+
+<h2>Product List</h2>
+
+<div>
+    <a href="@Url.Action("Create", "Product")" class="btn btn-success btn-sm">Create New Product</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product ID</th>
+            <th>Product Name</th>
+            <th>Category ID</th>
+            <th>Category Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+                <td>@product.ProductId</td>
+                <td>@product.ProductName</td>
+                <td>@product.CategoryId</td>
+                <td>@product.Category.CategoryName</td>
+                <td>
+                    <a href="@Url.Action("Edit", "Product", new { id = product.ProductId })" class="btn btn-primary btn-sm">Edit</a>
+                   @*  <a href="@Url.Action("Edit", "Product", new { id = product.ProductId })" class="btn btn-primary btn-sm">Edit</a> *@
+
+                    <!-- Delete button that triggers the delete confirmation page -->
+                    <a href="@Url.Action("Delete", "Product", new { id = product.ProductId })" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    @for (int i = 1; i <= Model.TotalPages; i++)
+    {
+        <a href="@Url.Action("Index", "Product", new { page = i })">@i</a>
+        @if (i < Model.TotalPages)
+        {
+            @: |
+        }
+    }
+</div>
+
+
+
+

@@ -1,0 +1,15 @@
+﻿@model ProjectCRUDOperation.Models.Category
+
+@{
+    ViewData["Title"] = "Delete Category";
+}
+
+<h1>Delete Category</h1>
+
+<h4>Are you sure you want to delete the category @Model.CategoryName?</h4>
+<hr />
+<form asp-action="DeleteConfirmed" method="post" asp-route-id="@Model.CategoryId">
+    <input type="hidden" asp-for="CategoryId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="@Url.Action("Index")" class="btn btn-secondary">Cancel</a>
+</form>
