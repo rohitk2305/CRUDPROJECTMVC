@@ -12,3 +12,9 @@
     <!-- Automatically redirect to the Index page after 2 seconds -->
     <meta http-equiv="refresh" content="2; url=@Url.Action("Index", "Product")" />
 }
+else
+{
+    <div class="alert alert-success">
+        @TempData["ErrorMessage"]
+    </div>
+}

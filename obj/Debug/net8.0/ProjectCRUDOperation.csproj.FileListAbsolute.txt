@@ -267,6 +267,7 @@ D:\ASP DOT NET PROJECT\ProjectCRUDOperation\obj\Debug\net8.0\ProjectCRUDOperatio
 D:\ASP DOT NET PROJECT\ProjectCRUDOperation\obj\Debug\net8.0\ProjectCRUDOperation.MvcApplicationPartsAssemblyInfo.cache
 D:\ASP DOT NET PROJECT\ProjectCRUDOperation\obj\Debug\net8.0\ProjectCRUDOperation.RazorAssemblyInfo.cache
 D:\ASP DOT NET PROJECT\ProjectCRUDOperation\obj\Debug\net8.0\ProjectCRUDOperation.RazorAssemblyInfo.cs
+D:\ASP DOT NET PROJECT\ProjectCRUDOperation\obj\Debug\net8.0\ProjectCRUDOperation.sourcelink.json
 D:\ASP DOT NET PROJECT\ProjectCRUDOperation\obj\Debug\net8.0\staticwebassets.build.json
 D:\ASP DOT NET PROJECT\ProjectCRUDOperation\obj\Debug\net8.0\staticwebassets.development.json
 D:\ASP DOT NET PROJECT\ProjectCRUDOperation\obj\Debug\net8.0\staticwebassets\msbuild.ProjectCRUDOperation.Microsoft.AspNetCore.StaticWebAssets.props

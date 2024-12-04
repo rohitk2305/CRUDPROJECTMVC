@@ -1,25 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ProjectCRUDOperation.Data;
 using ProjectCRUDOperation.Models;
-using System.Linq;
+using ProjectCRUDOperation.Services;
 using System.Threading.Tasks;
 
 namespace ProjectCRUDOperation.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(ApplicationDbContext context)
+        public CategoryController(ICategoryService categoryService)
         {
-            _context = context;
+            _categoryService = categoryService;
         }
 
         // Display Categories
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var categories = _context.category.ToList();
+            var categories = await _categoryService.GetAllCategoriesAsync();
             return View(categories);
         }
 
@@ -36,8 +34,7 @@ namespace ProjectCRUDOperation.Controllers
         {
             if (!ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                await _categoryService.AddCategoryAsync(category);
                 TempData["SuccessMessage"] = "Category successfully added!";
                 //return RedirectToAction(nameof(Index));
             }
@@ -52,11 +49,12 @@ namespace ProjectCRUDOperation.Controllers
                 return NotFound();
             }
 
-            var category = await _context.category.FindAsync(id);
+            var category = await _categoryService.GetCategoryByIdAsync(id.Value);
             if (category == null)
             {
                 return NotFound();
             }
+
             return View(category);
         }
 
@@ -74,14 +72,13 @@ namespace ProjectCRUDOperation.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Category Updated successfully !";
+                    await _categoryService.UpdateCategoryAsync(category);
+                    TempData["SuccessMessage"] = "Category Updated successfully!";
                     //return RedirectToAction(nameof(Index));
                 }
                 catch
                 {
-                    if (!_context.category.Any(e => e.CategoryId == category.CategoryId))
+                    if (await _categoryService.GetCategoryByIdAsync(category.CategoryId) == null)
                     {
                         return NotFound();
                     }
@@ -90,7 +87,6 @@ namespace ProjectCRUDOperation.Controllers
                         throw;
                     }
                 }
-               // return RedirectToAction(nameof(Index));
             }
             return View(category);
         }
@@ -103,8 +99,7 @@ namespace ProjectCRUDOperation.Controllers
                 return NotFound();
             }
 
-            var category = await _context.category
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            var category = await _categoryService.GetCategoryByIdAsync(id.Value);
             if (category == null)
             {
                 return NotFound();
@@ -118,9 +113,7 @@ namespace ProjectCRUDOperation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.category.FindAsync(id);
-            _context.category.Remove(category);
-            await _context.SaveChangesAsync();
+            await _categoryService.DeleteCategoryAsync(id);
             TempData["SuccessMessage"] = "Category deleted successfully.";
             return View();
             //return RedirectToAction(nameof(Index));

@@ -1,54 +1,33 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// ProductController.cs
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using ProjectCRUDOperation.Data;
 using ProjectCRUDOperation.Models;
+using ProjectCRUDOperation.Services;
 using ProjectCRUDOperation.ViewModels;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ProjectCRUDOperation.Controllers
 {
     public class ProductController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IProductService _productService;
 
-        public ProductController(ApplicationDbContext context)
+        public ProductController(IProductService productService)
         {
-            _context = context;
+            _productService = productService;
         }
 
         // Display Product List with Pagination
         public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
-            // Total number of products
-            var totalProducts = await _context.product.CountAsync();
-
-            // Pagination logic
-            var totalPages = (int)System.Math.Ceiling(totalProducts / (double)pageSize);
-
-            // Get products for the current page
-            var products = await _context.product
-                .Include(p => p.Category)  // Include Category details
-                .Skip((page - 1) * pageSize)  // Skip records for previous pages
-                .Take(pageSize)  // Take records for the current page
-                .ToListAsync();
-
-            // Create ViewModel
-            var model = new ProductListViewModel
-            {
-                Products = products,
-                CurrentPage = page,
-                TotalPages = totalPages
-            };
-
+            var model = await _productService.GetProductsAsync(page, pageSize);
             return View(model);
         }
 
         // Add New Product
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.category, "CategoryId", "CategoryName");
+            ViewData["CategoryId"] = new SelectList(await _productService.GetCategoriesAsync(), "CategoryId", "CategoryName");
             return View(new Product());
         }
 
@@ -58,30 +37,21 @@ namespace ProjectCRUDOperation.Controllers
         {
             if (!ModelState.IsValid)
             {
-               
-                try
+                bool success = await _productService.CreateProductAsync(product);
+                if (success)
                 {
-                    // Add the new product to the database
-                    _context.Add(product);
-                    await _context.SaveChangesAsync();
-
-                    // Store a success message in TempData
                     TempData["SuccessMessage"] = "Product successfully added!";
-                    /*return RedirectToAction(nameof(Index)); */// Redirect back to the product list
+                    //return RedirectToAction(nameof(Index));
                 }
-                catch (Exception)
+                else
                 {
-                    // If something goes wrong, show an error message
                     TempData["ErrorMessage"] = "There was an error adding the product. Please try again.";
-                    //return RedirectToAction(nameof(Create)); // Stay on the Create page if there is an error
                 }
             }
 
-            // If model is invalid, return to the Create view with validation errors
-            ViewData["CategoryId"] = new SelectList(_context.category, "CategoryId", "CategoryName", product.CategoryId);
+            ViewData["CategoryId"] = new SelectList(await _productService.GetCategoriesAsync(), "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
         }
-
 
         // Edit Product
         public async Task<IActionResult> Edit(int? id)
@@ -90,18 +60,14 @@ namespace ProjectCRUDOperation.Controllers
             {
                 return NotFound();
             }
-            // Retrieve the product by ID
-            var product = await _context.product
-                .Include(p => p.Category)  // Include category details for the dropdown
-                .FirstOrDefaultAsync(m => m.ProductId == id);
 
+            var product = await _productService.GetProductByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
             }
 
-
-            ViewData["Category"] = new SelectList(await _context.category.ToListAsync(), "CategoryId", "CategoryName");
+            ViewData["CategoryId"] = new SelectList(await _productService.GetCategoriesAsync(), "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
         }
 
@@ -117,28 +83,19 @@ namespace ProjectCRUDOperation.Controllers
 
             if (!ModelState.IsValid)
             {
-                try
+                bool success = await _productService.UpdateProductAsync(product);
+                if (success)
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Product Updated successfully!";
+                    TempData["SuccessMessage"] = "Product updated successfully!";
+                   // return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!_context.product.Any(e => e.ProductId == product.ProductId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                    TempData["ErrorMessage"] = "There was an error adding the product. Please try again.";
+                    TempData["ErrorMessage"] = "There was an error updating the product.";
                 }
-                
             }
 
-            ViewData["Category"] = new SelectList(await _context.category.ToListAsync(), "CategoryId", "CategoryName", product.CategoryId);
+            ViewData["CategoryId"] = new SelectList(await _productService.GetCategoriesAsync(), "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
         }
 
@@ -150,9 +107,7 @@ namespace ProjectCRUDOperation.Controllers
                 return NotFound();
             }
 
-            var product = await _context.product
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            var product = await _productService.GetProductByIdAsync(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -166,17 +121,19 @@ namespace ProjectCRUDOperation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.product.FindAsync(id);
-            if (product == null)
+            bool success = await _productService.DeleteProductAsync(id);
+            if (success)
             {
-                return NotFound();
+                TempData["SuccessMessage"] = "Product deleted successfully.";
+                return View();
+                //return RedirectToAction(nameof(Index));
             }
-            _context.product.Remove(product);
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Product deleted successfully.";
-            return View();
-            //return RedirectToAction(nameof(Index));
-            //return Ok();
+            else
+            {
+                TempData["ErrorMessage"] = "There was an error deleting the product.";
+                return View();
+                //return RedirectToAction(nameof(Delete), new { id });
+            }
         }
     }
 }
